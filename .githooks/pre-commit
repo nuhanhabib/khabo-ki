@@ -1,0 +1,27 @@
+#!/bin/sh
+# Blocks commits that contain secrets. Enabled with: git config core.hooksPath .githooks
+
+fail=0
+
+# Forbidden files
+for f in $(git diff --cached --name-only --diff-filter=ACM); do
+  case "$f" in
+    *.jks|*.keystore|*.p12|*.pem|*.key|*key.properties|*google-services.json|*firebase_options.dart|.env|.env.*|*.dev.vars)
+      case "$f" in *.env.example) ;; *)
+        echo "BLOCKED: secret file staged: $f"; fail=1 ;;
+      esac ;;
+  esac
+done
+
+# Secret-looking content in added lines
+if git diff --cached -U0 | grep -E '^\+' | grep -nE \
+  'AIza[0-9A-Za-z_-]{35}|sk-ant-[0-9A-Za-z_-]{20,}|sk-[0-9A-Za-z]{32,}|ghp_[0-9A-Za-z]{36}|gho_[0-9A-Za-z]{36}|-----BEGIN [A-Z ]*PRIVATE KEY-----|storePassword *= *[^ ]|keyPassword *= *[^ ]'; then
+  echo "BLOCKED: possible secret in staged changes (see lines above)."
+  fail=1
+fi
+
+if [ "$fail" -ne 0 ]; then
+  echo "Commit aborted. Move secrets to .env / key.properties (gitignored)."
+  exit 1
+fi
+exit 0
