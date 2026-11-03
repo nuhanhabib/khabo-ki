@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
+import '../app_state.dart';
 import '../models/scan_result.dart';
 import '../screens/result_screen.dart';
 import '../theme.dart';
@@ -32,7 +33,7 @@ class ScanTile extends StatelessWidget {
           ),
         ),
         title: Text(
-          result.title,
+          result.title(AppScope.of(context).bangla),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(fontWeight: FontWeight.w600),

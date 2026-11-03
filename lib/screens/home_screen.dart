@@ -34,10 +34,18 @@ class _HomeScreenState extends State<HomeScreen> {
       if (file == null) return;
       setState(() => _busy = true);
       final result = await _analyzer.analyze(file.path);
+      if (!result.isFood) {
+        messenger.showSnackBar(
+          SnackBar(content: Text(state.l10n.t('notFood'))),
+        );
+        return;
+      }
       state.addScan(result);
       navigator.push(
         MaterialPageRoute(builder: (_) => ResultScreen(result: result)),
       );
+    } on AnalyzeException catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(state.l10n.t(e.code))));
     } catch (_) {
       messenger.showSnackBar(SnackBar(content: Text(state.l10n.t('error'))));
     } finally {

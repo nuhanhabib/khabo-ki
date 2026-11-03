@@ -67,4 +67,5 @@ firebase_options.dart
 .wrangler/
 .dev.vars
 secrets/
+app_secrets.json
 node_modules/

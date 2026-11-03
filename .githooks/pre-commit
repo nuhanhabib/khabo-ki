@@ -6,7 +6,7 @@ fail=0
 # Forbidden files
 for f in $(git diff --cached --name-only --diff-filter=ACM); do
   case "$f" in
-    *.jks|*.keystore|*.p12|*.pem|*.key|*key.properties|*google-services.json|*firebase_options.dart|.env|.env.*|*.dev.vars)
+    *.jks|*.keystore|*.p12|*.pem|*.key|*key.properties|*google-services.json|*firebase_options.dart|*app_secrets.json|.env|.env.*|*.dev.vars)
       case "$f" in *.env.example) ;; *)
         echo "BLOCKED: secret file staged: $f"; fail=1 ;;
       esac ;;

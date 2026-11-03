@@ -14,13 +14,17 @@ class ResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l = AppScope.of(context).l10n;
+    final state = AppScope.of(context);
+    final l = state.l10n;
+    final text = result.text(state.bangla);
     final path = result.imagePath;
     final (freshLabel, freshColor, freshIcon) = switch (result.freshness) {
       Freshness.fresh => (l.t('fresh'), KColors.leaf, Icons.eco),
       Freshness.checkFirst =>
         (l.t('checkFirst'), KColors.amber, Icons.warning_amber),
       Freshness.spoiled => (l.t('spoiled'), KColors.tomato, Icons.dangerous),
+      Freshness.unknown =>
+        (l.t('checkFirst'), KColors.amber, Icons.help_outline),
     };
 
     return Scaffold(
@@ -49,7 +53,7 @@ class ResultScreen extends StatelessWidget {
                             style: const TextStyle(color: Colors.black54)),
                         const SizedBox(height: 4),
                         Text(
-                          result.title,
+                          text.detected.join(', '),
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
@@ -73,32 +77,32 @@ class ResultScreen extends StatelessWidget {
           _Section(
             icon: Icons.search,
             title: l.t('detected'),
-            lines: result.detected,
+            lines: text.detected,
           ),
           _Section(
             icon: Icons.health_and_safety_outlined,
             title: l.t('risks'),
-            lines: result.risks,
+            lines: text.risks,
             color: KColors.tomato,
           ),
           _Section(
             icon: Icons.spa_outlined,
             title: l.t('nutrition'),
-            lines: result.nutrition,
+            lines: text.nutrition,
           ),
           _Section(
             icon: Icons.scale_outlined,
             title: l.t('portion'),
-            lines: [result.portion],
+            lines: [text.portion],
           ),
           _Section(
             icon: Icons.savings_outlined,
             title: l.t('budget'),
-            lines: [result.budgetTip],
+            lines: [text.budgetTip],
           ),
           const SizedBox(height: 8),
           Text(
-            '${l.t('sample')}\n${l.t('disclaimer')}',
+            l.t('disclaimer'),
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 12, color: Colors.black54),
           ),

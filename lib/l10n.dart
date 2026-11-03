@@ -25,7 +25,12 @@ class L10n {
     'spoiled': 'Likely spoiled',
     'disclaimer':
         'Based on a photo only. It cannot detect bacteria, chemicals or formalin. When in doubt, throw it out.',
-    'sample': 'Sample result — AI not connected yet',
+    'notFood': "This doesn't look like food. Please try another photo.",
+    'noInternet': 'No internet connection. Please check and try again.',
+    'rateLimited': 'Too many scans. Please wait a minute.',
+    'tooLarge': 'The photo is too large. Please try again.',
+    'notConfigured': 'App is not configured. Please update the app.',
+    'failed': 'Could not analyze right now. Please try again.',
     'clear': 'Clear history',
     'error': 'Could not open the image. Please try again.',
   };
@@ -52,7 +57,12 @@ class L10n {
     'spoiled': 'সম্ভবত নষ্ট',
     'disclaimer':
         'শুধু ছবির ভিত্তিতে। এটি জীবাণু, রাসায়নিক বা ফরমালিন শনাক্ত করতে পারে না। সন্দেহ হলে খাবেন না।',
-    'sample': 'নমুনা ফলাফল — AI এখনো যুক্ত হয়নি',
+    'notFood': 'এটি খাবার মনে হচ্ছে না। অন্য ছবি দিয়ে চেষ্টা করুন।',
+    'noInternet': 'ইন্টারনেট সংযোগ নেই। দেখে আবার চেষ্টা করুন।',
+    'rateLimited': 'অনেক বেশি স্ক্যান হয়েছে। এক মিনিট অপেক্ষা করুন।',
+    'tooLarge': 'ছবিটি অনেক বড়। আবার চেষ্টা করুন।',
+    'notConfigured': 'অ্যাপটি ঠিকমতো সেট করা নেই। অ্যাপ আপডেট করুন।',
+    'failed': 'এখন বিশ্লেষণ করা যাচ্ছে না। আবার চেষ্টা করুন।',
     'clear': 'ইতিহাস মুছুন',
     'error': 'ছবিটি খোলা যায়নি। আবার চেষ্টা করুন।',
   };
