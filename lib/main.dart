@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'app_state.dart';
 import 'screens/home_screen.dart';
+import 'screens/splash_screen.dart';
 import 'theme.dart';
 
 void main() {
@@ -9,9 +10,10 @@ void main() {
 }
 
 class KhaboKiApp extends StatelessWidget {
-  const KhaboKiApp({super.key, required this.state});
+  const KhaboKiApp({super.key, required this.state, this.showSplash = true});
 
   final AppState state;
+  final bool showSplash;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +23,7 @@ class KhaboKiApp extends StatelessWidget {
         title: 'Khabo Ki?',
         debugShowCheckedModeBanner: false,
         theme: buildTheme(),
-        home: const HomeScreen(),
+        home: showSplash ? const SplashScreen() : const HomeScreen(),
       ),
     );
   }

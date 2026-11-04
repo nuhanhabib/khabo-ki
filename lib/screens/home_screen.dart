@@ -4,9 +4,10 @@ import 'package:image_picker/image_picker.dart';
 import '../app_state.dart';
 import '../services/food_analyzer.dart';
 import '../theme.dart';
+import '../widgets/brand.dart';
 import '../widgets/scan_tile.dart';
+import 'analyzing_screen.dart';
 import 'history_screen.dart';
-import 'result_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,7 +19,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _picker = ImagePicker();
   final _analyzer = FoodAnalyzer();
-  bool _busy = false;
 
   Future<void> _scan(ImageSource source) async {
     final state = AppScope.of(context);
@@ -32,57 +32,20 @@ class _HomeScreenState extends State<HomeScreen> {
         imageQuality: 80,
       );
       if (file == null) return;
-      setState(() => _busy = true);
-      final result = await _analyzer.analyze(file.path);
-      if (!result.isFood) {
-        messenger.showSnackBar(
-          SnackBar(content: Text(state.l10n.t('notFood'))),
-        );
-        return;
-      }
-      state.addScan(result);
       navigator.push(
-        MaterialPageRoute(builder: (_) => ResultScreen(result: result)),
+        MaterialPageRoute(
+          builder: (_) =>
+              AnalyzingScreen(imagePath: file.path, analyzer: _analyzer),
+        ),
       );
-    } on AnalyzeException catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text(state.l10n.t(e.code))));
     } catch (_) {
       messenger.showSnackBar(SnackBar(content: Text(state.l10n.t('error'))));
-    } finally {
-      if (mounted) setState(() => _busy = false);
     }
   }
 
-  void _chooseSource() {
-    final l = AppScope.of(context).l10n;
-    showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      builder: (sheet) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.photo_camera_outlined),
-              title: Text(l.t('camera')),
-              onTap: () {
-                Navigator.pop(sheet);
-                _scan(ImageSource.camera);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo_library_outlined),
-              title: Text(l.t('gallery')),
-              onTap: () {
-                Navigator.pop(sheet);
-                _scan(ImageSource.gallery);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  void _openHistory() =>
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (_) => const HistoryScreen()));
 
   @override
   Widget build(BuildContext context) {
@@ -92,58 +55,111 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('KHABO KI?'),
+        titleSpacing: 16,
+        title: const Row(
+          children: [
+            Logo(size: 34),
+            SizedBox(width: 10),
+            Text(
+              'Khabo Ki?',
+              style: TextStyle(
+                color: KColors.deep,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
+        ),
         actions: [
-          TextButton(
-            onPressed: state.toggleLanguage,
-            child: Text(state.bangla ? 'EN' : 'বাংলা'),
-          ),
+          _LanguageToggle(bangla: state.bangla, onTap: state.toggleLanguage),
           IconButton(
             tooltip: l.t('history'),
-            icon: const Icon(Icons.history),
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const HistoryScreen()),
-            ),
+            icon: const Icon(Icons.history, color: KColors.greenDark),
+            onPressed: _openHistory,
           ),
+          const SizedBox(width: 4),
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
         children: [
           Text(
-            l.t('tagline'),
-            style: const TextStyle(fontSize: 16, color: KColors.olive),
+            l.t('greeting'),
+            style: const TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.w800,
+              color: KColors.ink,
+            ),
           ),
           const SizedBox(height: 4),
-          const Text(
-            'Eat like a Boss, not like a Victim',
-            style: TextStyle(fontWeight: FontWeight.w700, color: KColors.olive),
-          ),
-          const SizedBox(height: 24),
-          _ScanButton(
-            busy: _busy,
-            label: _busy ? l.t('analyzing') : l.t('scan'),
-            onTap: _busy ? null : _chooseSource,
-          ),
-          const SizedBox(height: 28),
           Text(
-            l.t('recent'),
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+            l.t('tagline'),
+            style: const TextStyle(color: KColors.greenDark, fontSize: 14),
+          ),
+          const SizedBox(height: 18),
+          _HeroScanCard(
+            label: l.t('scan'),
+            onTap: () => _scan(ImageSource.camera),
           ),
           const SizedBox(height: 12),
-          if (recent.isEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24),
-              child: Text(
-                l.t('noScans'),
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.black.withValues(alpha: 0.5)),
+          Row(
+            children: [
+              Expanded(
+                child: _SourceTile(
+                  icon: Icons.photo_camera_outlined,
+                  label: l.t('camera'),
+                  onTap: () => _scan(ImageSource.camera),
+                ),
               ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _SourceTile(
+                  icon: Icons.photo_library_outlined,
+                  label: l.t('gallery'),
+                  onTap: () => _scan(ImageSource.gallery),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 26),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  l.t('recent'),
+                  style: const TextStyle(
+                    fontSize: 19,
+                    fontWeight: FontWeight.w800,
+                    color: KColors.ink,
+                  ),
+                ),
+              ),
+              if (recent.isNotEmpty)
+                TextButton.icon(
+                  onPressed: _openHistory,
+                  iconAlignment: IconAlignment.end,
+                  icon: const Icon(Icons.arrow_forward, size: 18),
+                  label: Text(l.t('seeAll')),
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          if (recent.isEmpty)
+            Column(
+              children: [
+                const SizedBox(height: 8),
+                const Illustration(icon: Icons.fact_check_outlined),
+                const SizedBox(height: 12),
+                Text(
+                  l.t('noScans'),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 16, color: KColors.ink),
+                ),
+              ],
             )
           else
             for (final r in recent)
               Padding(
-                padding: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.only(bottom: 10),
                 child: ScanTile(result: r),
               ),
         ],
@@ -152,40 +168,147 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class _ScanButton extends StatelessWidget {
-  const _ScanButton({required this.busy, required this.label, this.onTap});
+class _LanguageToggle extends StatelessWidget {
+  const _LanguageToggle({required this.bangla, required this.onTap});
 
-  final bool busy;
+  final bool bangla;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget seg(String text, bool active) => AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: active ? KColors.greenDark : Colors.transparent,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: active ? Colors.white : KColors.greenDark,
+          fontWeight: FontWeight.w700,
+          fontSize: 13,
+        ),
+      ),
+    );
+    return Semantics(
+      button: true,
+      label: 'Language',
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(3),
+          decoration: BoxDecoration(
+            color: KColors.mint,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: KColors.greenLight.withValues(alpha: 0.5),
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [seg('বাংলা', bangla), seg('EN', !bangla)],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HeroScanCard extends StatelessWidget {
+  const _HeroScanCard({required this.label, required this.onTap});
+
   final String label;
-  final VoidCallback? onTap;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: KColors.olive,
       borderRadius: BorderRadius.circular(24),
+      clipBehavior: Clip.antiAlias,
+      child: Ink(
+        decoration: const BoxDecoration(gradient: kBrandGradient),
+        child: InkWell(
+          onTap: onTap,
+          child: SizedBox(
+            height: 210,
+            child: Stack(
+              children: [
+                // Food art along the bottom edge.
+                const Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: -6,
+                  child: Text(
+                    '🥬🍅🐟🥕🌶️🥦',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 40, letterSpacing: 2),
+                  ),
+                ),
+                Align(
+                  alignment: const Alignment(0, -0.35),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.center_focus_strong,
+                        size: 64,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        label,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SourceTile extends StatelessWidget {
+  const _SourceTile({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: KColors.mint,
+      borderRadius: BorderRadius.circular(18),
       child: InkWell(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(18),
         onTap: onTap,
-        child: SizedBox(
-          height: 200,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              busy
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : const Icon(
-                      Icons.center_focus_strong,
-                      size: 72,
-                      color: Colors.white,
-                    ),
-              const SizedBox(height: 16),
+              Icon(icon, color: KColors.greenDark, size: 28),
+              const SizedBox(height: 6),
               Text(
                 label,
+                textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
+                  color: KColors.ink,
                 ),
               ),
             ],

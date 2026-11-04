@@ -11,7 +11,8 @@ import '../models/scan_result.dart';
 /// Error codes map to l10n keys shown to the user.
 class AnalyzeException implements Exception {
   const AnalyzeException(this.code);
-  final String code; // noInternet | rateLimited | tooLarge | notConfigured | failed
+  final String
+  code; // noInternet | rateLimited | tooLarge | notConfigured | failed
 }
 
 /// Sends a food photo to the Khabo Ki? Worker, which calls the AI.

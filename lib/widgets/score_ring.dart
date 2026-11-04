@@ -4,7 +4,7 @@ import '../theme.dart';
 
 /// Circular 0–100 safety score indicator.
 class ScoreRing extends StatelessWidget {
-  const ScoreRing({super.key, required this.score, this.size = 96});
+  const ScoreRing({super.key, required this.score, this.size = 104});
 
   final int score;
   final double size;
@@ -19,7 +19,8 @@ class ScoreRing extends StatelessWidget {
         children: [
           CircularProgressIndicator(
             value: score / 100,
-            strokeWidth: size / 10,
+            strokeWidth: size / 9,
+            strokeCap: StrokeCap.round,
             color: color,
             backgroundColor: color.withValues(alpha: 0.15),
           ),
@@ -29,7 +30,7 @@ class ScoreRing extends StatelessWidget {
               style: TextStyle(
                 fontSize: size / 3,
                 fontWeight: FontWeight.w800,
-                color: color,
+                color: KColors.ink,
               ),
             ),
           ),
