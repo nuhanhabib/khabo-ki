@@ -1,17 +1,43 @@
-# khabo_ki
+<p align="center"><img src="docs/icon-512.png" width="120" alt="Khabo Ki? icon"></p>
 
-Khabo Ki? - AI-powered pocket food detective
+<h1 align="center">Khabo Ki? (খাবো কি?)</h1>
+<p align="center"><b>Your AI-powered pocket food detective</b><br>Eat like a Boss, not like a Victim.</p>
 
-## Getting Started
+Khabo Ki? ("What shall I eat?") is an Android app for Bangladesh. Point the camera at food and it tells you:
 
-This project is a starting point for a Flutter application.
+- **What it is**: detected foods
+- **Freshness**: fresh, check before eating, or likely spoiled (from visual signs only)
+- **Safety score** (0–100) and spoilage risks
+- **Nutrition**, portion estimate and a **budget tip in BDT**
+- Everything in **English and Bangla**
 
-A few resources to get you started if this is your first Flutter project:
+> ⚠️ The app judges food from a photo only. It **cannot** detect bacteria, chemicals or formalin, and it says so in the app.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+| Home | Scan | Result |
+|---|---|---|
+| <img src="docs/screenshots/home_en.png" width="200"> | <img src="docs/screenshots/home_bn_sheet.png" width="200"> | <img src="docs/screenshots/result_bn.png" width="200"> |
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Download
+
+Get the latest APK from **[Releases](https://github.com/nuhanhabib/khabo-ki/releases/latest)**. On your phone, open the link, tap `KhaboKi-vX.Y.Z.apk`, and allow "Install unknown apps" when asked.
+
+## For developers
+
+| Read this | To learn |
+|---|---|
+| [docs/SETUP.md](docs/SETUP.md) | Set up your PC and run the app (start here) |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | How the app, the Worker and Gemini fit together, and what each file does |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Branches, pull requests, code style and releasing |
+| [SECURITY.md](SECURITY.md) | Security rules everyone must follow |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | What's done and what's next |
+
+**Tech:** Flutter 3.47.9 (Dart) · Cloudflare Workers (TypeScript) · Google Gemini · GitHub Actions. Everything runs on free tiers.
+
+## Team
+
+- **Nuhan Habib** ([@nuhanhabib](https://github.com/nuhanhabib)), owner
+- [@MayazthecrazyMontasim](https://github.com/MayazthecrazyMontasim), developer
+
+Started at Next Gen Ideathon 2025, BRAC University (BUSB).
+
+[Privacy policy](PRIVACY.md)

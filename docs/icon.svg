@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" width="512" height="512">
-  <!-- Source for the temporary launcher icon (same shapes as ic_launcher_foreground.xml). -->
-  <rect width="108" height="108" rx="24" fill="#4B5E1A"/>
-  <path d="M32,42V32H42M66,32H76V42M76,66V76H66M42,76H32V66" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M54,39C67,44 69,59 54,70C39,59 41,44 54,39Z" fill="#A8CF45"/>
-  <path d="M54,44V67" stroke="#4B5E1A" stroke-width="2.5" stroke-linecap="round"/>
-</svg>
