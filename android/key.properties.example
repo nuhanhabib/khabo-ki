@@ -1,0 +1,6 @@
+# Copy this file to key.properties (gitignored) and fill in your own values.
+# NEVER commit key.properties or the .jks keystore.
+storeFile=C:/dev/keys/khaboki-release.jks
+storePassword=
+keyAlias=khaboki
+keyPassword=

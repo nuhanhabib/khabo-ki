@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Temporary Khabo Ki? icon: a leaf inside camera scan brackets. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:pathData="M32,42V32H42M66,32H76V42M76,66V76H66M42,76H32V66"
+        android:strokeWidth="4"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M54,39C67,44 69,59 54,70C39,59 41,44 54,39Z"
+        android:fillColor="#A8CF45" />
+    <path
+        android:pathData="M54,44V67"
+        android:strokeWidth="2.5"
+        android:strokeColor="#4B5E1A"
+        android:strokeLineCap="round" />
+</vector>

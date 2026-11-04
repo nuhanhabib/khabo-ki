@@ -1,0 +1,114 @@
+name: Build APK
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+# Least privilege by default; only the release job may write.
+permissions:
+  contents: read
+
+env:
+  FLUTTER_VERSION: '3.47.9'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      # Official Flutter SDK, pinned to the same version used locally.
+      - name: Install Flutter
+        run: |
+          git clone --depth 1 --branch "$FLUTTER_VERSION" https://github.com/flutter/flutter.git "$RUNNER_TEMP/flutter"
+          echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"
+
+      - name: Check and test
+        run: |
+          flutter --disable-analytics
+          flutter pub get
+          flutter analyze
+          flutter test
+
+      - name: Prepare signing key and app config
+        id: secrets
+        env:
+          KEYSTORE_B64: ${{ secrets.KHABOKI_KEYSTORE_B64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KHABOKI_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KHABOKI_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KHABOKI_KEY_PASSWORD }}
+          APP_KEY: ${{ secrets.KHABOKI_APP_KEY }}
+        run: |
+          if [ -z "$KEYSTORE_B64" ]; then
+            echo "No signing key available (for example a pull request from a fork). Skipping release build."
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/khaboki-release.jks"
+          umask 077
+          {
+            echo "storeFile=$RUNNER_TEMP/khaboki-release.jks"
+            echo "storePassword=$KEYSTORE_PASSWORD"
+            echo "keyAlias=$KEY_ALIAS"
+            echo "keyPassword=$KEY_PASSWORD"
+          } > android/key.properties
+          printf '{"APP_KEY":"%s"}' "$APP_KEY" > "$RUNNER_TEMP/app_secrets.json"
+          echo "signed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Build release APK
+        if: steps.secrets.outputs.signed == 'true'
+        env:
+          BUILD_NUMBER: ${{ github.run_number }}
+          BUILD_NAME: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || '' }}
+        run: |
+          args="--build-number=$BUILD_NUMBER"
+          [ -n "$BUILD_NAME" ] && args="$args --build-name=${BUILD_NAME#v}"
+          flutter build apk --release --obfuscate --split-debug-info=build/symbols \
+            --dart-define-from-file="$RUNNER_TEMP/app_secrets.json" $args
+          mkdir -p dist
+          cp build/app/outputs/flutter-apk/app-release.apk dist/
+
+      - name: Remove secrets
+        if: always()
+        run: rm -f "$RUNNER_TEMP/khaboki-release.jks" "$RUNNER_TEMP/app_secrets.json" android/key.properties
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: steps.secrets.outputs.signed == 'true'
+        with:
+          name: KhaboKi-apk
+          path: dist/*.apk
+          if-no-files-found: error
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: KhaboKi-apk
+          path: dist
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          test -f dist/app-release.apk || { echo "Signed APK missing; refusing to publish."; exit 1; }
+          mv dist/app-release.apk "dist/KhaboKi-$TAG.apk"
+          gh release create "$TAG" "dist/KhaboKi-$TAG.apk" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Khabo Ki? $TAG" \
+            --generate-notes
