@@ -1,19 +1,33 @@
 import 'package:flutter/material.dart';
 
-/// Brand colours taken from the Khabo Ki? poster.
+/// Brand colours taken from the app icon.
 class KColors {
-  static const olive = Color(0xFF4B5E1A);
-  static const leaf = Color(0xFF7BA428);
+  static const green = Color(0xFF3F9A12);
+  static const greenLight = Color(0xFF7BC41A);
+  static const greenDark = Color(0xFF2E7D0F);
+  static const deep = Color(0xFF1F5E0A);
+  static const lime = Color(0xFF9BE22A);
+  static const mint = Color(0xFFEAF5DD); // soft green fill for chips and tiles
   static const cream = Color(0xFFF7F6EF);
-  static const tomato = Color(0xFFE53935);
+  static const ink = Color(0xFF1C2416);
+  static const muted = Color(0xFF6B7363);
+  static const fresh = Color(0xFF43A047);
   static const amber = Color(0xFFF9A825);
+  static const tomato = Color(0xFFE53935);
+  static const blush = Color(0xFFFDECEC); // soft red fill for risk cards
 }
+
+const kBrandGradient = LinearGradient(
+  begin: Alignment.topLeft,
+  end: Alignment.bottomRight,
+  colors: [KColors.greenLight, KColors.greenDark],
+);
 
 ThemeData buildTheme() {
   final scheme = ColorScheme.fromSeed(
-    seedColor: KColors.olive,
-    primary: KColors.olive,
-    secondary: KColors.leaf,
+    seedColor: KColors.green,
+    primary: KColors.greenDark,
+    secondary: KColors.lime,
     error: KColors.tomato,
     surface: KColors.cream,
   );
@@ -23,13 +37,14 @@ ThemeData buildTheme() {
     scaffoldBackgroundColor: KColors.cream,
     appBarTheme: const AppBarTheme(
       backgroundColor: KColors.cream,
-      foregroundColor: KColors.olive,
+      foregroundColor: KColors.ink,
+      surfaceTintColor: Colors.transparent,
       elevation: 0,
       centerTitle: false,
       titleTextStyle: TextStyle(
-        color: KColors.olive,
-        fontSize: 22,
-        fontWeight: FontWeight.w800,
+        color: KColors.ink,
+        fontSize: 20,
+        fontWeight: FontWeight.w700,
       ),
     ),
     cardTheme: CardThemeData(
@@ -37,8 +52,24 @@ ThemeData buildTheme() {
       elevation: 0,
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(color: Colors.black.withValues(alpha: 0.05)),
+      ),
+    ),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        backgroundColor: KColors.greenDark,
+        minimumSize: const Size.fromHeight(56),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+      ),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: KColors.mint,
+      border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.black.withValues(alpha: 0.06)),
+        borderSide: BorderSide.none,
       ),
     ),
   );
@@ -46,7 +77,7 @@ ThemeData buildTheme() {
 
 /// Colour for a 0–100 safety score.
 Color scoreColor(int score) {
-  if (score >= 75) return KColors.leaf;
+  if (score >= 75) return KColors.fresh;
   if (score >= 50) return KColors.amber;
   return KColors.tomato;
 }

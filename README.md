@@ -13,9 +13,9 @@ Khabo Ki? ("What shall I eat?") is an Android app for Bangladesh. Point the came
 
 > ⚠️ The app judges food from a photo only. It **cannot** detect bacteria, chemicals or formalin, and it says so in the app.
 
-| Home | Scan | Result |
+| Home | Scanning | Not food |
 |---|---|---|
-| <img src="docs/screenshots/home_en.png" width="200"> | <img src="docs/screenshots/home_bn_sheet.png" width="200"> | <img src="docs/screenshots/result_bn.png" width="200"> |
+| <img src="docs/screenshots/home_en.png" width="200"> | <img src="docs/screenshots/scanning.png" width="200"> | <img src="docs/screenshots/not_food.png" width="200"> |
 
 ## Download
 

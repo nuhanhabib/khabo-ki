@@ -50,8 +50,7 @@ class ScanResult {
   final String? imagePath; // local only, never uploaded or stored remotely
 
   /// Bangla text falls back to English if the AI left it empty.
-  ScanText text(bool bangla) =>
-      bangla && bn.detected.isNotEmpty ? bn : en;
+  ScanText text(bool bangla) => bangla && bn.detected.isNotEmpty ? bn : en;
 
   String title(bool bangla) => text(bangla).detected.join(', ');
 
