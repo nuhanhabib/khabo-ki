@@ -1,5 +1,13 @@
 enum Freshness { fresh, checkFirst, spoiled, unknown }
 
+/// Same bands as scoreColor() in theme.dart: 75+ fresh, 50–74 check first,
+/// below 50 spoiled.
+Freshness freshnessForScore(int score) {
+  if (score >= 75) return Freshness.fresh;
+  if (score >= 50) return Freshness.checkFirst;
+  return Freshness.spoiled;
+}
+
 /// The text part of a result, in one language.
 class ScanText {
   const ScanText({
@@ -59,16 +67,22 @@ class ScanResult {
     String? imagePath,
     DateTime? scannedAt,
   }) {
-    final score = json['safetyScore'];
+    final rawScore = json['safetyScore'];
+    final isFood = json['isFood'] == true;
+    final score = rawScore is num ? rawScore.round().clamp(0, 100) : 0;
     return ScanResult(
-      isFood: json['isFood'] == true,
-      freshness: switch (json['freshness']) {
-        'fresh' => Freshness.fresh,
-        'check_first' => Freshness.checkFirst,
-        'spoiled' => Freshness.spoiled,
-        _ => Freshness.unknown,
-      },
-      safetyScore: score is num ? score.round().clamp(0, 100) : 0,
+      isFood: isFood,
+      // The label follows the score so the badge and the ring never disagree.
+      // The AI's own freshness word is only used when it sent no score.
+      freshness: isFood && rawScore is num
+          ? freshnessForScore(score)
+          : switch (json['freshness']) {
+              'fresh' => Freshness.fresh,
+              'check_first' => Freshness.checkFirst,
+              'spoiled' => Freshness.spoiled,
+              _ => Freshness.unknown,
+            },
+      safetyScore: score,
       en: ScanText.fromJson(json['en']),
       bn: ScanText.fromJson(json['bn']),
       scannedAt: scannedAt ?? DateTime.now(),

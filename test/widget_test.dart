@@ -116,4 +116,17 @@ void main() {
     expect(r.safetyScore, 100);
     expect(r.en.detected, isEmpty);
   });
+
+  test('freshness label follows the score, not the AI word', () {
+    Freshness f(String word, int score) => ScanResult.fromJson({
+      'isFood': true,
+      'freshness': word,
+      'safetyScore': score,
+    }).freshness;
+    expect(f('check_first', 30), Freshness.spoiled); // the banana bug
+    expect(f('spoiled', 90), Freshness.fresh);
+    expect(f('fresh', 60), Freshness.checkFirst);
+    expect(f('fresh', 75), Freshness.fresh);
+    expect(f('check_first', 49), Freshness.spoiled);
+  });
 }

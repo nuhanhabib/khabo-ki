@@ -69,3 +69,4 @@ firebase_options.dart
 secrets/
 app_secrets.json
 node_modules/
+promo/
